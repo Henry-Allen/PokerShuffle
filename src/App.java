@@ -15,6 +15,7 @@ class CardShufflerFrame extends javax.swing.JFrame {
     private static final int CARD_WIDTH = 80;
     private static final int CARD_HEIGHT = 116;
 
+    // GUI components
     private final javax.swing.JPanel gridPanel = new javax.swing.JPanel();
     private final java.util.List<javax.swing.JLabel> cardLabels = new java.util.ArrayList<>();
     private final java.util.List<javax.swing.ImageIcon> cardIcons = new java.util.ArrayList<>();
@@ -52,17 +53,20 @@ class CardShufflerFrame extends javax.swing.JFrame {
         cardIcons.clear();
 
         java.nio.file.Path dir = java.nio.file.Paths.get("cards");
+        // Check if the directory exists
         if (!java.nio.file.Files.isDirectory(dir)) {
             javax.swing.JOptionPane.showMessageDialog(this, "Cards directory not found: " + dir.toAbsolutePath(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         try (java.util.stream.Stream<java.nio.file.Path> stream = java.nio.file.Files.list(dir)) {
+            // Get all .png files in the directory, sorted alphabetically (1-52)
             java.util.List<java.nio.file.Path> files = stream
                 .filter(p -> p.getFileName().toString().toLowerCase().endsWith(".png"))
                 .sorted((a, b) -> a.getFileName().toString().compareToIgnoreCase(b.getFileName().toString()))
                 .toList();
 
+            // Check if there are 52 cards
             if (files.size() != 52) {
                 javax.swing.JOptionPane.showMessageDialog(
                     this,
@@ -73,6 +77,7 @@ class CardShufflerFrame extends javax.swing.JFrame {
                 return;
             }
 
+            // load the cards and get them ready to be displayed
             for (java.nio.file.Path p : files) {
                 javax.swing.ImageIcon icon = scaleIcon(new javax.swing.ImageIcon(p.toString()), CARD_WIDTH, CARD_HEIGHT);
                 cardIcons.add(icon);
@@ -87,6 +92,7 @@ class CardShufflerFrame extends javax.swing.JFrame {
         }
     }
 
+    // Layout the cards in order (only runs once on start)
     private void layoutCardsInOrder() {
         gridPanel.removeAll();
         for (javax.swing.JLabel lbl : cardLabels) {
@@ -96,6 +102,7 @@ class CardShufflerFrame extends javax.swing.JFrame {
         gridPanel.repaint();
     }
 
+    // Shuffle the cards and layout them in the grid
     private void shuffleCards() {
         java.util.List<javax.swing.JLabel> shuffled = new java.util.ArrayList<>(cardLabels);
         java.util.Collections.shuffle(shuffled);
@@ -107,6 +114,7 @@ class CardShufflerFrame extends javax.swing.JFrame {
         gridPanel.repaint();
     }
 
+    // Scale the icon to the desired size
     private static javax.swing.ImageIcon scaleIcon(javax.swing.ImageIcon src, int width, int height) {
         java.awt.Image img = src.getImage();
         java.awt.Image scaled = img.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH);
